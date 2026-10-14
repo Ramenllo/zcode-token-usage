@@ -1,0 +1,29 @@
+{
+  "name": "token-usage",
+  "version": "0.3.0",
+  "description": "ZCode token 用量仪表盘：随会话启动本地 stdio MCP 服务，不占 HTTP 端口；侧栏打开刷新无需模型请求，独立报告保留。",
+  "author": {
+    "name": "mac"
+  },
+  "license": "MIT",
+  "skills": "skills",
+  "commands": "commands",
+  "mcpServers": {
+    "usage": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${ZCODE_PLUGIN_ROOT}/mcp/server.mjs"]
+    }
+  },
+  "ui": {
+    "surfaces": [
+      {
+        "id": "token-usage",
+        "title": "Token 用量",
+        "server": "usage",
+        "resourceUri": "ui://token-usage/dashboard.html",
+        "availability": "session"
+      }
+    ]
+  }
+}

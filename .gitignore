@@ -1,0 +1,6 @@
+*.log
+.DS_Store
+tools/build/
+node_modules/
+*.backup
+*.sqlite

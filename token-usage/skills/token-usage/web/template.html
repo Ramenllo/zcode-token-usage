@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZCode Token 用量</title>
+<!--__STYLE__-->
+<!--__DATA__-->
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+      <path d="M4 19V6l9 9 7-7v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>ZCode Token 用量</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="usage" role="tab">Token 用量</button>
+    <button class="tab" data-tab="settings" role="tab">设置</button>
+  </nav>
+  <button class="refresh-btn" id="refreshBtn" type="button" hidden title="重新查询用量数据">
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="refreshLabel">刷新</span>
+  </button>
+  <div class="gen-at" id="genAt"></div>
+</header>
+
+<div class="sidebar-status" id="sidebarStatus" hidden></div>
+
+<main>
+  <!-- ================= Token 用量 ================= -->
+  <section id="tab-usage" class="page active">
+    <div class="toolbar">
+      <div class="cum">
+        <div class="cum-label">累计 Token 用量 <span class="cum-range" id="cumRange"></span></div>
+        <div class="cum-value" id="cumValue">–</div>
+        <div class="cum-sub" id="cumSub"></div>
+      </div>
+      <div class="picker">
+        <button class="picker-btn" id="pickerBtn" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="pickerLabel">近7天</span>
+          <span class="caret">▾</span>
+        </button>
+        <div class="picker-pop" id="pickerPop" hidden>
+          <div class="presets" id="presets"></div>
+          <div class="custom">
+            <div class="custom-title">自定义区间（按日，含起止全天）</div>
+            <div class="custom-row">
+              <input type="date" id="dateFrom">
+              <span class="custom-sep">至</span>
+              <input type="date" id="dateTo">
+            </div>
+            <button class="apply-btn" id="applyCustom">应用</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">用量明细<span class="card-meta" id="statMeta"></span><span class="card-hint" title="输入 = 完整提示词（含被缓存命中的部分）；缓存命中率 = 缓存读取 ÷ 完整提示词；点按任意磁贴可按模型展开明细（同一排一次只展开一项）；完整数字与口径说明悬停在磁贴上可见">?</span></div>
+      <div class="stat-list" id="statList"></div>
+    </div>
+
+    <div class="card models-card">
+      <div class="card-title">模型<span class="card-meta" id="modelGrid"></span><span class="card-sub" id="modelCount"></span></div>
+      <div class="ml-list" id="modelList"></div>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-title"><span id="chartTitle">近7日趋势</span><span class="card-meta" id="chartMeta"></span></div>
+      <div class="chart-wrap" id="chartWrap"></div>
+    </div>
+  </section>
+
+  <!-- ================= 设置 ================= -->
+  <section id="tab-settings" class="page">
+    <div class="card">
+      <div class="card-title">数据源</div>
+      <div class="kv-list" id="metaList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">指标口径</div>
+      <div class="kv-list" id="gaugeList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">刷新方式</div>
+      <p class="note" id="refreshNote">本报告是生成时刻的数据快照，不会自动更新。在 ZCode 会话中重新执行 <code>/token-usage</code> 即可重新查询数据库并生成本页。</p>
+    </div>
+  </section>
+</main>
+
+<div class="chart-tip" id="chartTip" hidden></div>
+<!--__APP__-->
+</body>
+</html>

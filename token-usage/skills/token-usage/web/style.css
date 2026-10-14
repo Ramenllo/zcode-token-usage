@@ -1,0 +1,340 @@
+/* ZCode Token 用量 —— 深色玻璃质感。同一份样式用于独立报告页与客户端内嵌面板：
+   面板由 tools/build-panel.mjs 把每个选择器前缀成 #zcode-tu-root，
+   所以这里对 :root/html/body 的设定就等于设定面板本体。 */
+:root {
+  --bg: #0a0c11;
+  --surface: rgba(255, 255, 255, 0.028);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --surface-3: rgba(255, 255, 255, 0.09);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(255, 255, 255, 0.14);
+  --text: #f2f5fa;
+  --text-2: #9aa4b4;
+  --text-3: #6b7484;
+  --accent: #6ea8ff;
+  --accent-soft: rgba(110, 168, 255, 0.16);
+  --accent-dim: #8fa8cf;
+  --radius: 18px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: dark; }
+/* 底色：近黑 + 左下冷光、右上微暖的辉光。写进 body 的 background，
+   面板里等价于面板自身的底（不会溢到宿主页面）。 */
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(115% 75% at 6% 102%, rgba(58, 98, 196, 0.20), transparent 62%),
+    radial-gradient(85% 60% at 100% 0%, rgba(148, 108, 66, 0.10), transparent 58%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%;
+  color: var(--text);
+  font: 13.5px/1.55 -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; font-size: 12px; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 9px; height: 9px; }
+html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08); border-radius: 5px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); background-clip: padding-box; }
+html::-webkit-scrollbar-track, body::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px; height: 56px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(12, 14, 20, 0.72);
+  backdrop-filter: blur(14px) saturate(1.2);
+  position: sticky; top: 0; z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14px; letter-spacing: 0.01em; color: var(--text); }
+.logo { color: var(--text); opacity: 0.92; }
+/* 分段控件（参考图右上 DAY/MONTH/TOTAL 的形态） */
+.tabs { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); }
+.tab {
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  color: var(--text-3); font-size: 12.5px; padding: 5px 12px; border-radius: 9px;
+  transition: background 0.15s, color 0.15s;
+}
+.tab:hover { color: var(--text-2); }
+.tab.active { color: var(--text); background: var(--surface-3); font-weight: 600; }
+.gen-at { margin-left: auto; color: var(--text-3); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+
+/* ---------- 布局 ---------- */
+main { max-width: 980px; margin: 0 auto; padding: 22px 24px 56px; }
+.page { display: none; }
+.page.active { display: block; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px; margin-top: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+/* 分区标题：小号大写 + 字距，右侧放同排的元信息/提示 */
+.card-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 12px;
+}
+.card-meta { margin-left: auto; color: var(--text-3); font-weight: 500; letter-spacing: 0.02em; text-transform: none; cursor: default; }
+.card-meta b { color: var(--text-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.card-sub { color: var(--text-3); font-size: 11.5px; font-weight: 400; letter-spacing: 0.02em; text-transform: none; }
+.card-hint {
+  width: 15px; height: 15px; flex: 0 0 auto; border-radius: 50%;
+  border: 1px solid var(--border-2); color: var(--text-3);
+  font-size: 10px; line-height: 13px; text-align: center; text-transform: none;
+  letter-spacing: 0; cursor: help;
+}
+.card-hint:hover { color: var(--text-2); border-color: var(--accent); }
+
+/* ---------- 工具栏：累计 + 时间选择器 ---------- */
+.toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.cum-label {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  color: var(--text-3); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+}
+.cum-range { color: var(--text-3); font-size: 11px; font-weight: 400; letter-spacing: 0.02em; text-transform: none; }
+.cum-value {
+  font-size: 42px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12;
+  margin-top: 6px; font-variant-numeric: tabular-nums;
+}
+.cum-sub { color: var(--accent-dim); font-size: 12px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+.picker { position: relative; flex-shrink: 0; }
+.picker-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-2);
+  padding: 7px 12px; border-radius: 11px; cursor: pointer; font-size: 12.5px; font-family: inherit;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.picker-btn:hover { border-color: var(--border-2); color: var(--text); background: var(--surface-2); }
+.picker-btn svg { color: var(--text-3); }
+.caret { color: var(--text-3); font-size: 10px; }
+.picker-pop {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 300px;
+  background: #14171e; border: 1px solid var(--border-2); border-radius: 16px;
+  padding: 14px; box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6);
+}
+.presets { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.preset {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-2);
+  padding: 7px 10px; border-radius: 10px; cursor: pointer; font-size: 12.5px; text-align: center; font-family: inherit;
+  transition: all 0.12s;
+}
+.preset:hover { color: var(--text); border-color: var(--border-2); background: var(--surface-2); }
+.preset.active { color: #fff; background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.custom { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.custom-title { color: var(--text-3); font-size: 11px; letter-spacing: 0.06em; margin-bottom: 8px; }
+.custom-row { display: flex; align-items: center; gap: 8px; }
+.custom-row input[type="date"] {
+  flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  border-radius: 9px; padding: 6px 8px; font-size: 12px; font-family: inherit;
+}
+.custom-sep { color: var(--text-3); font-size: 12px; }
+.apply-btn {
+  margin-top: 10px; width: 100%; padding: 7px 0; border-radius: 10px; border: none;
+  background: var(--accent); color: #08111f; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.apply-btn:hover { filter: brightness(1.08); }
+
+/* ---------- 用量明细：磁贴网格 + 末尾整行 ---------- */
+.stat-list { display: flex; flex-direction: column; gap: 6px; }
+.stat-tiles { display: flex; gap: 6px; }
+/* 基准尺寸按宽报告页(980px)定，面板的紧凑尺寸在 panel.css 里覆盖 */
+.tile {
+  position: relative; flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 14px 16px 15px; border-radius: 14px;
+  border: 1px solid transparent; background: var(--surface);
+  appearance: none; -webkit-appearance: none;
+  font: inherit; color: inherit; text-align: left;
+}
+button.tile { cursor: pointer; }
+.tile:hover { background: var(--surface-2); border-color: var(--border); }
+.tile.open { background: var(--surface-2); border-color: var(--border-2); }
+.tile-value {
+  font-size: 24px; font-weight: 700; letter-spacing: -0.015em; color: var(--text);
+  font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tile-label {
+  font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tile-caret { display: inline-block; font-style: normal; font-size: 9px; letter-spacing: 0; transition: transform 0.18s; }
+.tile.open .tile-caret { transform: rotate(180deg); color: var(--accent); }
+/* 最近使用时间：整行，左标签右数值 */
+.stat-line {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-radius: 14px; background: var(--surface);
+}
+.stat-line-name { color: var(--text-3); font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase; }
+.stat-line-val { margin-left: auto; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.stat-sub { padding: 2px 4px 6px 14px; }
+.model-row {
+  display: flex; align-items: center; gap: 12px; padding: 5px 0;
+  color: var(--text-2); font-size: 12.5px;
+}
+/* 名称吃剩余空间并省略号收敛、数值列定宽 —— 窄面板(≈400px)与宽报告页(980px)共用一套 */
+.model-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); cursor: default; }
+.model-val { flex: 0 0 auto; min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; color: var(--text); font-weight: 500; cursor: default; }
+.model-pct { flex: 0 0 46px; text-align: right; color: var(--text-3); font-variant-numeric: tabular-nums; }
+/* 生成速率明细：最近 5 分钟（左）与总速率（右，带「(总)」）两列定宽对齐 */
+.rate-recent, .rate-total { flex: 0 0 auto; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: default; }
+.rate-recent { flex-basis: 76px; color: var(--text-2); }
+.rate-total { flex-basis: 96px; color: var(--text); font-weight: 500; }
+.rate-tag { font-style: normal; color: var(--text-3); font-weight: 400; }
+
+/* ---------- 模型卡片 ---------- */
+/* 行高固定成整数值，配合 max-height 取整数倍 —— 滚动时不会切半行 */
+/* 不额外留右内边距：四列（名称/命中/用量/占比）已经填满整行宽度 */
+.ml-list { display: flex; flex-direction: column; max-height: 180px; overflow-y: auto; overscroll-behavior: contain; }
+.ml-list::-webkit-scrollbar { width: 7px; }
+.ml-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08); border-radius: 4px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+.ml-list::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); background-clip: padding-box; }
+.ml-list::-webkit-scrollbar-track { background: transparent; }
+/* flex-shrink: 0 是必须的：否则超出 max-height 时 flex 会把行压扁而不是滚动 */
+.ml-row { display: flex; align-items: center; gap: 10px; height: 30px; flex: 0 0 auto; padding: 0 6px; font-size: 13px; border-radius: 8px; }
+.ml-row:hover { background: var(--surface-2); }
+.ml-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); cursor: default; }
+/* 速度/命中都是弱化色（辅助指标），只有用量是加粗的主指标 */
+.ml-speed { flex: 0 0 auto; min-width: 56px; text-align: right; color: var(--text-3); font-variant-numeric: tabular-nums; cursor: default; }
+.ml-hit { flex: 0 0 auto; min-width: 48px; text-align: right; color: var(--text-3); font-variant-numeric: tabular-nums; cursor: default; }
+.ml-val { flex: 0 0 auto; min-width: 62px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); letter-spacing: -0.01em; cursor: default; }
+
+/* ---------- 走势图 ---------- */
+.chart-card { padding-bottom: 12px; }
+.chart-wrap { position: relative; }
+.chart-wrap svg { display: block; width: 100%; }
+.grid-line { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; stroke-dasharray: 3 5; }
+.axis-text { fill: var(--text-3); font-size: 10.5px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.axis-text.mid { text-anchor: middle; }
+.axis-text.end { text-anchor: end; }
+.line-path { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dot { fill: #0e1116; stroke: var(--accent); stroke-width: 2; }
+.dot.hl { fill: var(--accent); stroke-width: 2; }
+.hit-col { fill: transparent; cursor: crosshair; }
+.chart-tip {
+  position: fixed; z-index: 50; pointer-events: none;
+  background: #14171e; border: 1px solid var(--border-2); border-radius: 14px;
+  padding: 10px 12px; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.62);
+  font-size: 12px; min-width: 190px; max-width: 300px;
+}
+.tip-date { font-weight: 600; color: var(--text); margin-bottom: 6px; font-size: 12.5px; }
+.tip-total { display: flex; justify-content: space-between; gap: 16px; color: var(--text); padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.tip-model { display: flex; justify-content: space-between; gap: 16px; color: var(--text-2); padding: 2px 0; font-variant-numeric: tabular-nums; }
+.tip-model b { color: var(--text); font-weight: 500; }
+
+/* ---------- 设置页 ---------- */
+.kv-list { display: flex; flex-direction: column; gap: 0; }
+.kv { display: flex; gap: 16px; padding: 9px 2px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.kv:last-child { border-bottom: none; }
+.kv dt { color: var(--text-2); width: 170px; flex-shrink: 0; }
+.kv dd { color: var(--text); word-break: break-all; }
+.note { color: var(--text-2); font-size: 12.5px; line-height: 1.75; }
+.empty-hint { color: var(--text-3); text-align: center; padding: 30px 0; font-size: 12.5px; }
+
+/* ================= 侧栏（window.__ZCODE_SIDEBAR__）=================
+   侧栏比独立报告页窄得多，默认报告页样式在 360/420/600px 下会横向溢出、
+   字号偏大、图表按 920 宽度缩放导致文字极小。这里只在侧栏生效地收紧。 */
+.refresh-btn { display: none; }
+.sidebar .refresh-btn { display: inline-flex; }
+.sidebar-status { display: none; }
+.sidebar .sidebar-status:not([hidden]) { display: block; }
+
+/* 顶栏改两行 grid：第一行 brand + 更新时间，第二行 tabs + 刷新。
+   height:auto 让两行各自成行，任何宽度都不横向溢出；子项 min-width:0 允许省略号收敛。 */
+.sidebar .topbar {
+  display: grid; grid-auto-rows: auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "brand gen" "tabs refresh";
+  align-items: center; gap: 8px 10px;
+  height: auto; padding: 9px 12px;
+}
+.sidebar .brand { grid-area: brand; min-width: 0; font-size: 13px; gap: 7px; }
+.sidebar .brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar .logo { width: 17px; height: 17px; flex: 0 0 auto; }
+.sidebar .gen-at { grid-area: gen; margin-left: 0; font-size: 10.5px; white-space: nowrap; }
+.sidebar .tabs { grid-area: tabs; justify-self: start; min-width: 0; }
+.sidebar .tab { white-space: nowrap; }
+
+/* 刷新按钮：紧凑、可禁用，加载中旋转 */
+.sidebar .refresh-btn {
+  grid-area: refresh; justify-self: end;
+  align-items: center; gap: 5px; flex: 0 0 auto;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-2);
+  padding: 5px 9px; border-radius: 9px; cursor: pointer; font-size: 11.5px; font-family: inherit;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.sidebar .refresh-btn:hover:not(:disabled) { border-color: var(--border-2); color: var(--text); background: var(--surface-2); }
+.sidebar .refresh-btn:disabled { opacity: 0.55; cursor: default; }
+.sidebar .refresh-btn.busy svg { animation: tu-spin 0.8s linear infinite; }
+@keyframes tu-spin { to { transform: rotate(360deg); } }
+
+/* 状态条：加载 / 错误 / 旧数据提示 */
+.sidebar-status {
+  padding: 7px 14px; font-size: 11.5px; line-height: 1.5;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-status.loading { color: var(--text-3); }
+.sidebar-status.error, .sidebar-status.stale {
+  color: #ffd9a0; background: rgba(196, 120, 40, 0.14);
+}
+.sidebar-status .retry-btn {
+  margin-left: 8px; background: var(--surface-2); border: 1px solid var(--border-2);
+  color: var(--text); border-radius: 7px; padding: 2px 9px; font: inherit; font-size: 11px; cursor: pointer;
+}
+.sidebar-status .retry-btn:hover { background: var(--surface-3); }
+
+.sidebar main { max-width: none; padding: 12px 12px 32px; }
+.sidebar .card { padding: 15px 14px; margin-top: 12px; border-radius: 15px; }
+.sidebar .toolbar { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 12px; }
+.sidebar .cum-value { font-size: 30px; margin-top: 2px; }
+.sidebar .cum-range { font-size: 10.5px; }
+.sidebar .cum-sub { font-size: 11px; }
+.sidebar .picker { align-self: flex-start; }
+.sidebar .picker-btn { padding: 6px 10px; font-size: 12px; }
+/* 弹层不以按钮右边锚点往左展开（窄侧栏会被裁），改左对齐并夹在视口内 */
+.sidebar .picker-pop { left: 0; right: auto; width: min(280px, calc(100vw - 24px)); padding: 12px; }
+.sidebar .stat-tiles { gap: 5px; }
+.sidebar .tile { padding: 11px 10px 12px; border-radius: 12px; gap: 4px; }
+.sidebar .tile-value { font-size: 19px; }
+.sidebar .tile-label { font-size: 9.5px; letter-spacing: 0.08em; }
+.sidebar .stat-line { padding: 11px 12px; }
+.sidebar .stat-line-name { font-size: 9.5px; letter-spacing: 0.08em; }
+.sidebar .stat-line-val { font-size: 12.5px; }
+.sidebar .model-row { gap: 8px; font-size: 12px; }
+.sidebar .model-val { min-width: 52px; }
+.sidebar .model-pct { flex-basis: 40px; }
+.sidebar .rate-recent { flex-basis: 66px; }
+.sidebar .rate-total { flex-basis: 84px; }
+/* 模型卡片：窄侧栏里把速度/命中列收窄，名字吃剩余空间并省略号收敛 */
+.sidebar .ml-row { gap: 6px; font-size: 12.5px; padding: 0 4px; }
+.sidebar .ml-speed { min-width: 44px; }
+.sidebar .ml-hit { min-width: 40px; }
+.sidebar .ml-val { min-width: 54px; }
+.sidebar .card-title { font-size: 10.5px; letter-spacing: 0.1em; margin-bottom: 10px; }
+.sidebar .kv { flex-direction: column; gap: 2px; padding: 7px 2px; }
+.sidebar .kv dt { width: auto; }
+/* 图表：宽度由 JS 按 chartWrap 实测宽度设，容器不许被内容撑宽 */
+.sidebar .chart-wrap { width: 100%; }
+/* 提示气泡用 position:fixed + 视口坐标定位，不随侧栏定位上下文偏移 */
+.sidebar .chart-tip { position: fixed; max-width: min(300px, calc(100vw - 24px)); }
+/* 模型名可能很长，长名字在气泡里换行，避免撑破容器 */
+.tip-model span, .tip-total span { min-width: 0; overflow-wrap: anywhere; }
+
+/* 极窄（≈360px）：磁贴字号再降一档，避免「3 个磁贴一行放不下」 */
+@media (max-width: 380px) {
+  .sidebar .tile-value { font-size: 17px; }
+  .sidebar .tile-label { font-size: 9px; letter-spacing: 0.06em; }
+  .sidebar .cum-value { font-size: 26px; }
+}
+

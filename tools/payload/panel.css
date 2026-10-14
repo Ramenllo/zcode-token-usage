@@ -1,0 +1,122 @@
+/* Panel-only styles (already scoped by hand; the dashboard stylesheet is scoped by
+   tools/build-panel.mjs). Nothing here may touch selectors outside our own nodes,
+   because it is injected into ZCode's live renderer. */
+
+/* 顶部按钮排里的入口图标 —— 与相邻按钮同高、同色，随排浮动 */
+button[data-zcode-token-usage="icon"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin: 0 1px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.65;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition: background 0.12s, opacity 0.12s;
+}
+button[data-zcode-token-usage="icon"]:hover { background: rgba(127, 127, 127, 0.18); opacity: 1; }
+button[data-zcode-token-usage="icon"][data-active="true"] { background: rgba(127, 127, 127, 0.2); opacity: 1; }
+button[data-zcode-token-usage="icon"] svg { display: block; }
+
+/* hover 面板本体：fixed 定位在图标下方，脱离 header 的 overflow 裁剪 */
+#zcode-tu-root {
+  position: fixed;
+  z-index: 2147483000;
+  width: 400px;
+  max-height: min(700px, calc(100vh - 88px));
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* 毛玻璃：半透明深底 + 模糊身后的客户端界面（底色和光晕覆盖掉 style.css 里 body 那套不透明底，
+     报告页仍是整页不透明 —— 这层只在面板里生效） */
+  background-color: rgba(10, 12, 17, 0.62);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 26%),
+    radial-gradient(115% 75% at 6% 102%, rgba(58, 98, 196, 0.24), transparent 62%),
+    radial-gradient(85% 60% at 100% 0%, rgba(148, 108, 66, 0.13), transparent 58%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: var(--radius);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.62),
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  -webkit-app-region: no-drag;
+}
+#zcode-tu-root[hidden] { display: none; }
+
+/* 面板内的紧凑排版覆盖：400px 宽，顶栏必须保持单行 */
+#zcode-tu-root .topbar { height: 44px; padding: 0 10px; gap: 8px; flex-wrap: nowrap; }
+#zcode-tu-root .brand { display: none; } /* 图标就在按钮排里，面板里不必再重复一个 logo */
+#zcode-tu-root .tabs { flex: 0 0 auto; }
+#zcode-tu-root .tab { font-size: 12px; padding: 4px 9px; white-space: nowrap; }
+/* 生成时间是可压缩项：吃剩余宽度，放不下就省略号，不与按钮抢位置 */
+#zcode-tu-root .gen-at { flex: 1 1 auto; min-width: 0; margin-left: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; text-align: right; }
+#zcode-tu-root main { max-width: none; margin: 0; padding: 10px 12px 14px; }
+#zcode-tu-root .toolbar { margin-top: 2px; gap: 10px; align-items: flex-start; }
+#zcode-tu-root .cum { min-width: 0; flex: 1 1 auto; }
+#zcode-tu-root .cum-label { display: block; font-size: 10.5px; }
+#zcode-tu-root .cum-range { display: block; margin-top: 2px; }
+#zcode-tu-root .cum-value { font-size: 30px; margin-top: 4px; }
+#zcode-tu-root .cum-sub { font-size: 11.5px; }
+#zcode-tu-root .picker { flex: 0 0 auto; }
+#zcode-tu-root .picker-btn { padding: 5px 9px; font-size: 12px; white-space: nowrap; }
+#zcode-tu-root .card { padding: 12px 12px; margin-top: 10px; }
+#zcode-tu-root .card-title { margin-bottom: 9px; }
+#zcode-tu-root .stat-list { gap: 5px; }
+#zcode-tu-root .stat-tiles { gap: 5px; }
+#zcode-tu-root .tile { padding: 7px 8px 8px; border-radius: 11px; gap: 2px; }
+#zcode-tu-root .tile-value { font-size: 15px; }
+#zcode-tu-root .tile-label { font-size: 9px; letter-spacing: 0.09em; }
+#zcode-tu-root .tile-caret { font-size: 8px; }
+#zcode-tu-root .stat-line { padding: 8px; border-radius: 11px; }
+#zcode-tu-root .stat-line-name { font-size: 9px; letter-spacing: 0.09em; }
+#zcode-tu-root .stat-line-val { font-size: 12px; }
+#zcode-tu-root .stat-sub { padding: 2px 2px 4px 10px; }
+#zcode-tu-root .model-val { min-width: 56px; }
+#zcode-tu-root .model-pct { flex: 0 0 40px; }
+#zcode-tu-root .ml-list { max-height: 150px; } /* 5 行整 */
+#zcode-tu-root .ml-name { font-size: 12.5px; }
+#zcode-tu-root .ml-speed { min-width: 52px; font-size: 12.5px; }
+#zcode-tu-root .ml-hit { min-width: 44px; font-size: 12.5px; }
+#zcode-tu-root .ml-val { min-width: 56px; font-size: 12.5px; }
+#zcode-tu-root .ml-row { height: 30px; padding: 0 4px; gap: 8px; }
+#zcode-tu-root .kv dt { width: 112px; font-size: 12px; }
+#zcode-tu-root .kv { font-size: 12px; }
+#zcode-tu-root .note { font-size: 12px; }
+#zcode-tu-root .picker-pop { width: 268px; }
+#zcode-tu-root .presets { gap: 6px; }
+#zcode-tu-root .preset { font-size: 12px; padding: 6px 8px; }
+
+/* 面板工具条 */
+#zcode-tu-root .ztu-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+#zcode-tu-root .ztu-act {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+#zcode-tu-root .ztu-act:hover { color: var(--text); border-color: var(--accent); }
+#zcode-tu-root .ztu-act[data-on="true"] { color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+
+#zcode-tu-root .ztu-status {
+  color: var(--text-3);
+  font-size: 12px;
+  padding: 8px 2px 0;
+}
+#zcode-tu-root .ztu-status[hidden] { display: none; }
+#zcode-tu-root .ztu-status.err { color: #ff8a8a; }

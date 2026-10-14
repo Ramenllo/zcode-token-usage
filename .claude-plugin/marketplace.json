@@ -1,0 +1,14 @@
+{
+  "name": "local-token-usage",
+  "owner": {
+    "name": "mac"
+  },
+  "plugins": [
+    {
+      "name": "token-usage",
+      "source": "./token-usage",
+      "version": "0.3.0",
+      "description": "ZCode token 用量仪表盘：随会话启动本地 stdio MCP 服务，不占 HTTP 端口；侧栏打开刷新无需模型请求，独立报告保留（token 消耗、生成速率、缓存命中、近7日走势）。"
+    }
+  ]
+}
